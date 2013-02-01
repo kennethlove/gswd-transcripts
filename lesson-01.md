@@ -60,10 +60,12 @@ After that, we’ll do `vagrant ssh` to SSH into the Vagrant VM. In the home fol
 
 ### PuTTY
 1. Install PuTTY
-2. Set host to 127.0.0.1, Port to 2222
-3. Go into connection/SSH/auth and browse to `c:/Users/<your username>/.vagrant.d/insecure_private_key`
-4. Go back to main session screen, click on "Default Settings", then click "Save" so you won't have to repeat these steps
-5. Click "Open" to start SSH.
+2. Using PuTTYGen convert the %HOMEPATH%\.vagrant.d\insecure_private_key to .ppk
+3. Set host to 127.0.0.1, Port to 2222 
+4. Go into connection/SSH/auth and browse to `c:/Users/<your username>/.vagrant.d/<your generated key.ppk>`
+5. Go back to main session screen, click on "Default Settings", then click "Save" so you won't have to repeat these steps
+6. Click "Open" to start SSH.
+7. Enter `vagrant` as username if prompted
 
 If you don't see shared folders after running the `postinstall.sh` script, try the following:
 
