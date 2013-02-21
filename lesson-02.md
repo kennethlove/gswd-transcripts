@@ -1,14 +1,18 @@
+## Introduction
+
 Welcome to episode 2 of Getting Started with Django. In the first episode, we created the Microblog project and got it running on Heroku, but it didn't really do anything. Now let's take it further and get something we can actually use.
 
 The first thing you'll want to do is go back to the directory where you previously did `vagrant up` and run that command again. Whenever you're finished working, you'll want to run `vagrant halt` or `vagrant suspend` so that vagrant will power down the VM and the VM will be waiting for you to come back. If you run `vagrant destroy`, it'll delete the VM and wipe out all of the work you've done installing packages and the like. Your code will still be safe, of course, because it's on your system, not the VM.
 
 Source the environment again (`source ~/blog-venv/bin/activate`), and go back to the `/vagrant/projects/microblog/` directory.
 
-### South ###
+**NOTE:** All addresses given from here on are consider to be *within* the `microblog/` directory (e.g. `microblog/templates/` would actually be `/vagrant/projects/microblog/microblog/templates/` assuming you followed my path structure exactly).
+
+## South ##
 
 The first thing we need to do is install [South](http://south.readthedocs.org/en/0.7.6/). South is a great Django tool that handles data and schema migrations. Schema migrations are what we call changes to your database structure, and data migrations would be scripted changes of data. `pip install south` will get it installed and then you'll want to add `south` to the `THIRD_PARTY_APPS` tuple in `settings/base.py`. The last thing we need to do is run `python manage.py syncdb` to create South's needed table.
 
-### Our First App ###
+## Our First App ##
 
 Since our project is a blog, we should create an app named "blog". It's typically best practice to name apps with plural names, but "blogs" doesn't fit our intended usage; we're creating one blog, not multiple blogs.
 
@@ -16,11 +20,11 @@ Run `python manage.py startapp blog` and Django will create all of our needed fi
 
 Open up `settings/base.py` again and add `blog` to the `LOCAL_APPS` tuple. Now we'll open up `blog/models.py` to start creating models for our app.
 
-#### The Post Model ####
+### The Post Model ###
 
 The first model we're going to create is going to be named `Post`. Model names are always singular because they, logically, represent a single instance of that object. We'll extend `models.Model` to make our class inherit from Django's generic `Model` class.
 
-##### Fields
+#### Fields
 
 To start on the model, we'll add a field named `created_at` that is a `DateTimeField` with `auto_now_add=True` and `editable=False`. This will cause the model to save a timestamp of when an instance was first created and not show this field to us for editing in the admin.
 
@@ -44,7 +48,7 @@ class Post(models.Model):
     published = models.BooleanField(default=True)
 ```
 
-##### Methods
+#### Methods
 
 We're going to add an `__unicode__` method to our class. This method is called any time Django wants to know how to represent a model instance. We want our Posts to be represented by their title, so we'll `return self.title`.
 
@@ -60,7 +64,7 @@ def save(self, *args, **kwargs):
     super(Post, self).save(*args, **kwargs)
 ```
 
-#### Migration
+### Migration
 
 Now that we have a model defined and the app installed, we need to get the model into the database. We don't want to run `syncdb` so we'll create a schema migration using South.
 
@@ -262,13 +266,13 @@ In the admin, if you go to edit a post and look in the URL, you'll see a number,
 
 Back in `urls.py`, we'll add another new URL, this time one that accepts a PK in a named regex block. 
 
-`url(r"^blog/(?<pk>\d+)/$", blog_detail),`
+`url(r"^blog/(?P<pk>\d+)/$", blog_detail),`
 
 Then we'll also be sure to import `blog_detail` from our `views` module. Save and then load `http://127.0.0.1:8888/blog/1` and you should see the blog post. Obviously we don't want to have to type in explicit URLs like that.
 
 First, let's name our URLs. Let's give the newest one the `name` of `"blog_detail"`, and the previous one the `name` of `"blog_list"`.
 
-Now, back in the `post_list.html` template, we need to make the post's name a link to the detail view. Inside the `<li>` that's created for each post, add an `<a>` tag who's `href` attribute is `{% url blog_detail post.pk %}`. This will resolve the URL with that name and argument and replace the tag with that value.
+Now, back in the `post_list.html` template, we need to make the post's name a link to the detail view. Inside the `<li>` that's created for each post, add an `<a>` tag who's `href` attribute is `{% url 'blog_detail' post.pk %}`. This will resolve the URL with that name and argument and replace the tag with that value.
 
 **NOTE:** The `{% url %}` tag is changing in Django 1.5. The URL name must now be quoted. Since you use the `{% url %}` tag *a lot*, I don't think it's worth the trouble of having to edit all of your templates when you upgrade to Django 1.5 or beyond. So, at the top of your templates, load the new `{% url %}` tag from future with `{% load url from future %}`. Now make sure all of your URL names are quoted and you've made your code future-ready.
 
@@ -483,7 +487,7 @@ So go to "Sites" in the admin and update the record to hold onto your Heroku dom
 
 And, with that, we have everything deployed, live, and served completely from Heroku.
 
-## SUMMARY ##
+## Summary ##
 
 For this episode, we've covered:
 
